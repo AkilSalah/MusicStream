@@ -1,1 +1,50 @@
-<p>navbar works!</p>
+<header class="bg-transparent text-slate-700 container relative mx-auto flex flex-col overflow-hidden px-4 py-4 lg:flex-row lg:items-center">
+    <a href="" class="flex items-center whitespace-nowrap text-2xl font-black">
+      <span class="mr-2 w-56">
+        <img src="../../../../assets/img/logoMusicStream.png"  alt="" />
+      </span>
+    </a>
+    <input type="checkbox" class="peer hidden" id="navbar-open" />
+    <label class="absolute top-5 right-5 cursor-pointer lg:hidden" for="navbar-open">
+      <svg class="h-7 w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </label>
+    <nav aria-label="Header Navigation" class="peer-checked:pt-8 peer-checked:max-h-60 flex max-h-0 w-full flex-col items-center overflow-hidden transition-all lg:ml-24 lg:max-h-full lg:flex-row">
+      <ul class="flex w-full flex-col items-center space-y-2 lg:flex-row lg:justify-center lg:space-y-0">
+        <li class="lg:mr-12"><a class="rounded text-gray-700  transition focus:outline-none focus:ring-blue-700 focus:ring-offset-2 hover:text-[#842d77] block font-semibold text-[16px]" routerLink="">Home</a></li>
+        <li class="lg:mr-12"><a class="rounded text-gray-700  transition focus:outline-none focus:ring-blue-700 focus:ring-offset-2 hover:text-[#842d77] block font-semibold text-[16px]" routerLink="/category">Library</a></li>
+        <li class="lg:mr-12"><a class="rounded text-gray-700  transition focus:outline-none focus:ring-blue-700 focus:ring-offset-2 hover:text-[#842d77] block font-semibold text-[16px]" routerLink="/category">Tracks</a></li>
+      </ul>
+      <hr class="mt-4 w-full lg:hidden" />
+      <div class="my-4 flex items-center space-x-6 space-y-2 lg:my-0 lg:ml-auto lg:space-x-8 lg:space-y-0">
+        
+        <form class="max-w-md  mx-auto">   
+            <div class="relative gap-96">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    </svg>
+                </div>
+                <div class="flex justify-between items-center">
+                    <input 
+                      type="search"
+                      name="search"
+                      id="default-search" 
+                      class="block p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                      placeholder="Search Task" 
+                      required 
+                    />
+                    <button 
+                      type="submit" 
+                      class="text-white ms-4 bg-[#842d77] hover:bg-[#c747b4] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      Search
+                    </button>
+                  </div>
+            </div>
+        </form>
+      </div>
+    </nav>
+  </header>
+  
