@@ -1,7 +1,7 @@
 import { createAction, props } from "@ngrx/store";
 import { Track } from "../../../core/models/track";
 
-export const ACTION = createAction(
+export const loadTracks = createAction(
 '[Track] Load Tracks'
 );
 export const addTrack = createAction(
