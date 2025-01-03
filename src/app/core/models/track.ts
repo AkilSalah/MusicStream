@@ -14,5 +14,5 @@ export interface Track {
   description?: string;
   date: Date;
   duration: number;
-  category: MusicCategory;
+  categories: MusicCategory;
 }
