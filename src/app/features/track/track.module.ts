@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { TrackRoutingModule } from './track-routing.module';
 import { TrackComponent } from './track.component';
+import { StoreModule } from '@ngrx/store';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { TrackComponent } from './track.component';
   ],
   imports: [
     CommonModule,
-    TrackRoutingModule
+    TrackRoutingModule,
+    StoreModule.forRoot({}, {}),
   ]
 })
 export class TrackModule { }
