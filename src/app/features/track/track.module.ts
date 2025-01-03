@@ -13,7 +13,6 @@ import { StoreModule } from '@ngrx/store';
   imports: [
     CommonModule,
     TrackRoutingModule,
-    StoreModule.forRoot({}, {}),
   ]
 })
 export class TrackModule { }
