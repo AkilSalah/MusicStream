@@ -1,0 +1,4 @@
+#crud-modal {
+    z-index: 1000 !important; /* Assurez que le modal soit toujours au-dessus */
+  }
+  
