@@ -19,6 +19,18 @@ export class TrackEffects {
     )
   );
 
+  // addTrack$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(TrackActions.addTrack),
+  //     mergeMap(action =>
+  //       this.indexedDbService.addTrackWithAudio(action.track, action.audioFile).pipe(
+  //         map(track => TrackActions.addTrackSuccess({ track })),
+  //         catchError(error => of({ type: '[Track] Add Track Error', payload: error }))
+  //       )
+  //     )
+  //   )
+  // );
+
   addTrack$ = createEffect(() =>
     this.actions$.pipe(
       ofType(TrackActions.addTrack),

@@ -4,33 +4,38 @@ import { map, switchMap } from 'rxjs/operators';
 import { Track } from '../models/track';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class IndexedDbService {
   private dbName = 'MusicStreamDB';
-  private dbVersion = 1;
+  private dbVersion = 2;
+  private db$: Observable<IDBDatabase>;
 
-  constructor() {}
-
-  initDatabase(): Observable<void> {
-    return this.openDatabase().pipe(
-      map(() => {
-        console.log('Base de données initialisée avec succès');
-      })
-    );
+  constructor() {
+    this.db$ = this.initDatabase();
   }
 
-  private openDatabase(): Observable<IDBDatabase> {
+  private initDatabase(): Observable<IDBDatabase> {
     return new Observable<IDBDatabase>((observer) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
 
       request.onupgradeneeded = (event) => {
         const db = request.result;
+
+        // Création de la table tracks (métadonnées)
         if (!db.objectStoreNames.contains('tracks')) {
-          db.createObjectStore('tracks', { keyPath: 'id', autoIncrement: true });
+          const trackStore = db.createObjectStore('tracks', { keyPath: 'id' });
+          trackStore.createIndex('title', 'title', { unique: false });
+          trackStore.createIndex('artist', 'artist', { unique: false });
+          trackStore.createIndex('category', 'category', { unique: false });
+          trackStore.createIndex('description', 'description', { unique: false });
+          trackStore.createIndex('date', 'date', { unique: false });
+          trackStore.createIndex('duration', 'duration', { unique: false });
         }
+
         if (!db.objectStoreNames.contains('audioFiles')) {
-          db.createObjectStore('audioFiles', { keyPath: 'id', autoIncrement: true });
+          const audioFileStore = db.createObjectStore('audioFiles', { keyPath: 'id' });
+          audioFileStore.createIndex('trackId', 'trackId', { unique: false });
         }
       };
 
@@ -46,12 +51,12 @@ export class IndexedDbService {
   }
 
   addTrack(track: Track): Observable<Track> {
-    return this.openDatabase().pipe(
+    return this.db$.pipe(
       switchMap(db => {
         return new Observable<Track>(observer => {
           const transaction = db.transaction(['tracks'], 'readwrite');
           const store = transaction.objectStore('tracks');
-          const request = store.add(track);
+          const request = store.add({ ...track, id: crypto.randomUUID() });
 
           request.onsuccess = () => {
             observer.next(track);
@@ -67,7 +72,7 @@ export class IndexedDbService {
   }
 
   getAllTracks(): Observable<Track[]> {
-    return this.openDatabase().pipe(
+    return this.db$.pipe(
       switchMap(db => {
         return new Observable<Track[]>(observer => {
           const transaction = db.transaction(['tracks'], 'readonly');
@@ -88,7 +93,7 @@ export class IndexedDbService {
   }
 
   updateTrack(track: Track): Observable<Track> {
-    return this.openDatabase().pipe(
+    return this.db$.pipe(
       switchMap(db => {
         return new Observable<Track>(observer => {
           const transaction = db.transaction(['tracks'], 'readwrite');
@@ -109,7 +114,7 @@ export class IndexedDbService {
   }
 
   deleteTrack(id: string): Observable<void> {
-    return this.openDatabase().pipe(
+    return this.db$.pipe(
       switchMap(db => {
         return new Observable<void>(observer => {
           const transaction = db.transaction(['tracks'], 'readwrite');
@@ -129,3 +134,4 @@ export class IndexedDbService {
     );
   }
 }
+

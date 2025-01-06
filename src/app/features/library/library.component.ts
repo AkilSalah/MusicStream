@@ -1,29 +1,32 @@
-import { Component } from '@angular/core';
-import { Track } from '../../core/models/track';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import * as TrackActions from '../store/actions/track.action'; 
-import * as fromTrackSelectors from '../store/selectors/track.selectors';
-
+import { Track } from '../../core/models/track';
+import { IndexedDbService } from '../../core/services/indexed-db.service';
 
 @Component({
   selector: 'app-library',
   templateUrl: './library.component.html',
-  styleUrl: './library.component.css'
+  styleUrls: ['./library.component.css'] 
 })
-export class LibraryComponent {
+export class LibraryComponent implements OnInit {
   tracks$: Observable<Track[]>;
   filteredTracks$: Observable<Track[]>;
   searchTerm = '';
   isModalVisible: boolean = false;
 
-  constructor(private store: Store) {
-    this.tracks$ = this.store.select(fromTrackSelectors.selectAllTracks);
+  constructor(private indexedDbService: IndexedDbService) {
+    this.tracks$ = this.indexedDbService.getAllTracks();
     this.filteredTracks$ = this.tracks$;
   }
 
   ngOnInit() {
-    this.store.dispatch(TrackActions.loadTracks());
+    // Load tracks from IndexedDB
+    this.loadTracks();
+  }
+
+  loadTracks() {
+    this.tracks$ = this.indexedDbService.getAllTracks();
+    this.filteredTracks$ = this.tracks$;
   }
 
   showModal() {
@@ -36,7 +39,24 @@ export class LibraryComponent {
 
   onSongSubmit(track: Track): void {
     console.log('Song submitted:', track);
-    this.store.dispatch(TrackActions.addTrack({ track }));
-    this.closeModal();
+    this.indexedDbService.addTrack(track).subscribe({
+      next: () => {
+        console.log('Track added successfully');
+        this.loadTracks(); // Reload tracks after adding
+        this.closeModal();
+      },
+      error: (error) => console.error('Error adding track:', error)
+    });
+  }
+
+  deleteTrack(id: string) {
+    this.indexedDbService.deleteTrack(id).subscribe({
+      next: () => {
+        console.log('Track deleted successfully');
+        this.loadTracks(); // Reload tracks after deleting
+      },
+      error: (error) => console.error('Error deleting track:', error)
+    });
   }
 }
+

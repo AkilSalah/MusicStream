@@ -7,6 +7,7 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { StoreModule } from '@ngrx/store';
 import { FormGroup, FormsModule } from '@angular/forms';
+import { trackReducer } from './features/store/reducers/track.reducer';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { FormGroup, FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ tracks: trackReducer }), 
   ],
   providers: [],
   bootstrap: [AppComponent]

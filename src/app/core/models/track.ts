@@ -1,18 +1,17 @@
-
 export enum MusicCategory {
-    POP = 'pop',
-    ROCK = 'rock',
-    RAP = 'rap',
-    CHAABI = 'cha3bi',
-    RAI = 'rai'
-  }
+  POP = 'pop',
+  ROCK = 'rock',
+  RAP = 'rap',
+  CHAABI = 'cha3bi',
+  RAI = 'rai'
+}
 
 export interface Track {
-  id: string;
+  id?: string;
   title: string;
   artist: string;
   description?: string;
   date: Date;
   duration: number;
-  categories: MusicCategory;
+  category: MusicCategory;
 }
