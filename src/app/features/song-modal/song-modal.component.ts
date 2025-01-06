@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Track, MusicCategory } from '../../core/models/track';
 
 @Component({
   selector: 'app-song-modal',
@@ -9,24 +10,53 @@ import { CommonModule } from '@angular/common';
   templateUrl: './song-modal.component.html'
 })
 export class SongModalComponent {
-  @Input() isVisible: boolean = false;
-  @Output() modalClose: EventEmitter<void> = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<any>();
+  @Input() isVisible = false;
+  @Input() track: Track | null = null;
+  @Output() modalClose = new EventEmitter<void>();
+  @Output() submit = new EventEmitter<Track>();
 
-  songData = {
-    name: '',
-    price: '',
-    category: '',
-    description: ''
-  };
+  trackForm: FormGroup;
+  categories = Object.values(MusicCategory);
+
+  constructor(private fb: FormBuilder) {
+    this.trackForm = this.fb.group({
+      title: ['', [Validators.required, Validators.maxLength(50)]],
+      artist: ['', [Validators.required]],
+      description: ['', [Validators.maxLength(200)]],
+      category: ['', [Validators.required]],
+      trackFile: [null, [Validators.required]]
+    });
+  }
+
+  ngOnChanges() {
+    if (this.track) {
+      this.trackForm.patchValue(this.track);
+    }
+  }
 
   closeModal() {
-    this.isVisible = false;
     this.modalClose.emit();
   }
 
   onSubmit() {
-    this.submit.emit(this.songData);
-    this.closeModal();
+    if (this.trackForm.valid) {
+      const formData = this.trackForm.value;
+      const track: Track = {
+        ...formData,
+        id: this.track ? this.track.id : null,
+        date: new Date(),
+        duration: 0 // This will be calculated when processing the audio file
+      };
+      this.submit.emit(track);
+    }
+  }
+
+  onFileChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.trackForm.patchValue({
+        trackFile: file
+      });
+    }
   }
 }

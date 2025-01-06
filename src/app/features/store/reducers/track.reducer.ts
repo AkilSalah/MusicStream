@@ -1,39 +1,30 @@
 import { createReducer, on } from '@ngrx/store';
-import { Track } from "../../../core/models/track";
-import { addTrack, deleteTrack, updateTrack, loadTracks } from '../actions/track.action';
+import * as TrackActions from '../actions/track.action';
+import { Track } from '../../../core/models/track';
 
-export interface State {
+export interface TrackState {
   tracks: Track[];
   loading: boolean;
   error: string | null;
 }
 
-export const initialState: State = {
+export const initialState: TrackState = {
   tracks: [],
   loading: false,
-  error: null,
+  error: null
 };
 
 export const trackReducer = createReducer(
   initialState,
-  
-  on(addTrack, (state, { track }) => ({
-    ...state,
-    tracks: [...state.tracks, track]
-  })),
-
-  on(updateTrack, (state, { track }) => ({
+  on(TrackActions.loadTracks, state => ({ ...state, loading: true })),
+  on(TrackActions.loadTracksSuccess, (state, { tracks }) => ({ ...state, tracks, loading: false })),
+  on(TrackActions.addTrackSuccess, (state, { track }) => ({ ...state, tracks: [...state.tracks, track] })),
+  on(TrackActions.updateTrackSuccess, (state, { track }) => ({
     ...state,
     tracks: state.tracks.map(t => t.id === track.id ? track : t)
   })),
-
-  on(deleteTrack, (state, { id }) => ({
+  on(TrackActions.deleteTrackSuccess, (state, { id }) => ({
     ...state,
-    tracks: state.tracks.filter(track => track.id !== id)
-  })),
-
-  on(loadTracks, state => ({
-    ...state,
-    loading: true
+    tracks: state.tracks.filter(t => t.id !== id)
   }))
 );
