@@ -61,11 +61,11 @@
         </app-song-modal>
         
         <div class="w-full flex flex-wrap gap-4 sm:w-1/2 md:w-1/3 lg:w-1/6 p-4">
-            <div class="relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105">
+            <div *ngFor="let track of tracks$ | async" class="relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105">
                 <div class="relative">
                     <img src="../../../assets/img/a1.jpg" alt="Album Cover" class="w-full h-auto">
                     <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded">
-                        <p class="text-sm font-bold">3:34</p>
+                        <p class="text-sm font-bold">{{track.duration}}</p>
                     </div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
                         <a routerLink="/track" class="text-white hover:text-gray-200 transition-colors duration-300">
@@ -78,9 +78,9 @@
                 </div>
                 <div class="p-4 bg-white">
                     <a href="#" class="block mb-1">
-                        <h5 class="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors duration-300">Histoire 9dima</h5>
+                        <h5 class="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors duration-300">{{track.title}} </h5>
                     </a>
-                    <p class="text-sm text-gray-600">Cheb Akil</p>
+                    <p class="text-sm text-gray-600"> {{track.artist}} </p>
                 </div>
             </div>
         </div>

@@ -11,7 +11,7 @@
           </button>
         </div>
   
-        <form [formGroup]="trackForm" class="p-4 md:p-5">
+        <form [formGroup]="trackForm" (ngSubmit) ="onSubmit()" class="p-4 md:p-5">
           <div class="grid gap-4 mb-4 grid-cols-2">
             <div class="col-span-2">
               <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
