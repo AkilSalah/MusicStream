@@ -134,7 +134,16 @@ export class TrackService {
       })
     );
   }
-  
+  // Dans le service
+updateTrackMetadata(track: Track): Observable<Track> {
+  return this.saveTrackMetadata(track).pipe(
+    map(() => track),
+    catchError((error) => {
+      console.error('Error updating track metadata:', error);
+      return throwError(() => new Error('Error updating track metadata.'));
+    })
+  );
+}
 
   updateTrack(updatedTrack: Track, audioFile: Blob): Observable<Track> {
     return this.saveTrackMetadata(updatedTrack).pipe(

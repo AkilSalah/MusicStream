@@ -12,9 +12,12 @@ import { Track, MusicCategory } from '../../core/models/track';
 export class SongModalComponent implements OnChanges {
   @Input() isVisible = false;
   @Input() track: Track | null = null;
+  @Input() mode: 'add' | 'update' = 'add';
   @Output() modalClose = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<{ track: Track, audioFile: File }>();
+  @Output() submit = new EventEmitter<{ track: Track, audioFile: File | null }>();
+  
   audioFile: File | null = null;
+  modalTitle: string = 'Create New Track';
 
   trackForm: FormGroup;
   categories = Object.values(MusicCategory);
@@ -40,13 +43,20 @@ export class SongModalComponent implements OnChanges {
     this.audioFile = null;
   }
 
-  // Update form if track is passed from parent
   ngOnChanges() {
-    if (this.track) {
-      this.trackForm.patchValue(this.track);
-    } else if (this.isVisible) {
-      this.trackForm.reset();
-      this.audioFile = null;
+    if (this.track && this.mode === 'update') {
+      this.modalTitle = 'Update Track';
+      this.trackForm.patchValue({
+        title: this.track.title,
+        artist: this.track.artist,
+        description: this.track.description,
+        category: this.track.category
+      });
+    } else {
+      this.modalTitle = 'Create New Track';
+      if (this.isVisible) {
+        this.resetForm();
+      }
     }
   }
 
@@ -64,19 +74,20 @@ export class SongModalComponent implements OnChanges {
   }
 
   onSubmit() {
-    if (this.trackForm.valid && this.audioFile) {
+    if (this.trackForm.valid) {
       const formValue = this.trackForm.value;
       const track: Track = {
-        id: this.track?.id || '',  // Use an empty string for new tracks
+        id: this.mode === 'update' ? this.track!.id : '',
         title: formValue.title,
         artist: formValue.artist,
         description: formValue.description || '',
         category: formValue.category,
-        addedAt: new Date(),
-        duration: 0,  // This will be calculated when needed
-        fileUrl: this.audioFile?.name || ''  // Assuming this.audioFile is the file object and fileUrl is the path
+        addedAt: this.mode === 'update' ? this.track!.addedAt : new Date(),
+        duration: this.mode === 'update' ? this.track!.duration : 0,
+        fileUrl: this.mode === 'update' ? this.track!.fileUrl : (this.audioFile?.name || '')
       };
       
+      // Dans le cas d'une mise à jour, l'audioFile est optionnel
       this.submit.emit({ track, audioFile: this.audioFile });
       this.resetForm();
       this.closeModal();
