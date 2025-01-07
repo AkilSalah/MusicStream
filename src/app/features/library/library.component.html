@@ -51,39 +51,43 @@
                 Add Track
               </button>
             </div>
-          </div>
-          
-          
-        <app-song-modal 
-        [isVisible]="isModalVisible" 
-        (modalClose)="closeModal()"
-        (submit)="onSongSubmit($event)">
-        </app-song-modal>
+        </div>
+            
+            <app-song-modal
+              [isVisible]="isModalVisible"
+              (modalClose)="closeModal()"
+              (submit)="onSongSubmit($event)">
+            </app-song-modal>
+            
         
-        <div class="w-full flex flex-wrap gap-4 sm:w-1/2 md:w-1/3 lg:w-1/6 p-4">
-            <div *ngFor="let track of tracks$ | async" class="relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105">
-                <div class="relative">
+            <div class="flex flex-wrap gap-4 p-4">
+              <div *ngFor="let track of (tracks$ | async)" class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6">
+                <div class="relative overflow-hidden rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105">
+                  <div class="relative">
                     <img src="../../../assets/img/a1.jpg" alt="Album Cover" class="w-full h-auto">
                     <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded">
-                        <p class="text-sm font-bold">{{track.duration}}</p>
+                      <p class="text-sm font-bold">{{track.duration}}</p>
                     </div>
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                        <a routerLink="/track" class="text-white hover:text-gray-200 transition-colors duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </a>
+                      <a routerLink="/track" class="text-white hover:text-gray-200 transition-colors duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </a>
                     </div>
-                </div>
-                <div class="p-4 bg-white">
+                  </div>
+                  <div class="p-4 bg-white">
                     <a href="#" class="block mb-1">
-                        <h5 class="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors duration-300">{{track.title}} </h5>
+                      <h5 class="text-lg font-semibold text-gray-900 hover:text-gray-700 transition-colors duration-300">{{track.title}}</h5>
                     </a>
-                    <p class="text-sm text-gray-600"> {{track.artist}} </p>
+                    <p class="text-sm text-gray-600">{{track.artist}}</p>
+                    <button (click)="deleteTrack(track.id)" class="mt-2 text-blue-600 hover:text-blue-800">Update</button>
+                    <button (click)="deleteTrack(track.id)" class="mt-2 ml-3 text-red-600 hover:text-red-800">Delete</button>
+                  </div>
                 </div>
-            </div>
-        </div>
+              </div>
+            </div>         
     </div>
   </main>
 

@@ -19,7 +19,7 @@ import { trackReducer } from './features/store/reducers/track.reducer';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    StoreModule.forRoot({ tracks: trackReducer }), 
+    // StoreModule.forRoot({ tracks: trackReducer }), 
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -8,7 +8,6 @@ import { trackReducer } from '../store/reducers/track.reducer';
 import { TrackEffects } from '../store/effects/track.effects';
 import { EffectsModule } from '@ngrx/effects';
 
-
 @NgModule({
   declarations: [
     TrackComponent,

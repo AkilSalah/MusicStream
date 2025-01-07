@@ -11,10 +11,10 @@ import * as fromTrackSelectors from '../store/selectors/track.selectors';
   styleUrl: './track.component.css'
 })
 export class TrackComponent {
-  tracks$: Observable<Track[]>;
-  constructor(private store: Store) {
-    this.tracks$ = this.store.select(fromTrackSelectors.selectAllTracks);
-  }
+  // tracks$: Observable<Track[]>;
+  // constructor(private store: Store) {
+  //   this.tracks$ = this.store.select(fromTrackSelectors.selectAllTracks);
+  // }
   // ngOnInit() {
   //   this.store.dispatch(TrackActions.loadTracks());
   // }

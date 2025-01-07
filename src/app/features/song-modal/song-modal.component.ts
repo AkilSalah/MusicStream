@@ -13,7 +13,8 @@ export class SongModalComponent implements OnChanges {
   @Input() isVisible = false;
   @Input() track: Track | null = null;
   @Output() modalClose = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<Track>();
+  @Output() submit = new EventEmitter<{ track: Track, audioFile: File }>();
+  audioFile: File | null = null;
 
   trackForm: FormGroup;
   categories = Object.values(MusicCategory);
@@ -23,40 +24,64 @@ export class SongModalComponent implements OnChanges {
       title: ['', [Validators.required, Validators.maxLength(50)]],
       artist: ['', [Validators.required]],
       description: ['', [Validators.maxLength(200)]],
-      category: ['', [Validators.required]],
-      trackFile: [null, [Validators.required]]
+      category: [null, [Validators.required]],
     });
   }
 
+  // Close modal
+  closeModal() {
+    this.modalClose.emit();
+    this.resetForm();
+  }
+
+  // Reset form and audioFile
+  resetForm() {
+    this.trackForm.reset();
+    this.audioFile = null;
+  }
+
+  // Update form if track is passed from parent
   ngOnChanges() {
     if (this.track) {
       this.trackForm.patchValue(this.track);
+    } else if (this.isVisible) {
+      this.trackForm.reset();
+      this.audioFile = null;
     }
   }
 
-  closeModal() {
-    this.modalClose.emit();
-  }
-
-  onSubmit() {
-    if (this.trackForm.valid) {
-      const formData = this.trackForm.value;
-      const track: Track = {
-        ...formData,
-        id: this.track ? this.track.id : undefined,
-        date: new Date(),
-        duration: 0 
-      };
-      this.submit.emit(track);
-    }
-  }
-
+  // Handle file change (audio file)
   onFileChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      // You can add file processing logic here if needed
-      this.trackForm.patchValue({ trackFile: file });
+      const audio = new Audio();
+      audio.src = URL.createObjectURL(file);
+      audio.onloadedmetadata = () => {
+        this.trackForm.patchValue({ duration: Math.round(audio.duration) });
+      };
+      this.audioFile = file;
     }
   }
-}
 
+  onSubmit() {
+    if (this.trackForm.valid && this.audioFile) {
+      const formValue = this.trackForm.value;
+      const track: Track = {
+        id: this.track?.id || '',  // Use an empty string for new tracks
+        title: formValue.title,
+        artist: formValue.artist,
+        description: formValue.description || '',
+        category: formValue.category,
+        addedAt: new Date(),
+        duration: 0,  // This will be calculated when needed
+        fileUrl: this.audioFile?.name || ''  // Assuming this.audioFile is the file object and fileUrl is the path
+      };
+      
+      this.submit.emit({ track, audioFile: this.audioFile });
+      this.resetForm();
+      this.closeModal();
+    }
+  }
+  
+  
+}
