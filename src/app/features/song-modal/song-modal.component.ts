@@ -26,7 +26,7 @@ export class SongModalComponent implements OnChanges {
     this.trackForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(50)]],
       artist: ['', [Validators.required]],
-      description: ['', [Validators.maxLength(200)]],
+      description: ['', [Validators.maxLength(400)]],
       category: [null, [Validators.required]],
       duration: [0], 
     });

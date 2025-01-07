@@ -4,6 +4,8 @@ import { Track } from '../../core/models/track';
 import { Store } from '@ngrx/store';
 import * as TrackActions from '../store/actions/track.action'; 
 import * as fromTrackSelectors from '../store/selectors/track.selectors';
+import { ActivatedRoute } from '@angular/router';
+import { TrackService } from '../../core/services/indexed-db.service';
 
 @Component({
   selector: 'app-track',
@@ -11,20 +13,19 @@ import * as fromTrackSelectors from '../store/selectors/track.selectors';
   styleUrl: './track.component.css'
 })
 export class TrackComponent {
-  // tracks$: Observable<Track[]>;
-  // constructor(private store: Store) {
-  //   this.tracks$ = this.store.select(fromTrackSelectors.selectAllTracks);
-  // }
-  // ngOnInit() {
-  //   this.store.dispatch(TrackActions.loadTracks());
-  // }
+  track: any;
 
-  // editTrack(track: Track) {
-  //   // Implement edit logic (e.g., open modal with track data)
-  // }
+  constructor(
+    private route: ActivatedRoute,
+    private trackService: TrackService
+  ) {}
 
-  // deleteTrack(id: string) {
-  //   this.store.dispatch(TrackActions.deleteTrack({ id }));
-  // }
-
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      const trackId = params['id'];
+      this.trackService.getTrackById(trackId).subscribe(track => {
+        this.track = track;
+      });
+    });
+  }
 }

@@ -12,17 +12,17 @@
                 <div class="text-white">
                     <div class="mb-4 md:mb-8">
                         <p class="text-sm uppercase tracking-wide text-gray-300">See what’s new</p>
-                        <h2 class="text-2xl md:text-3xl font-bold">Cheb Akil</h2>
+                        <h2 class="text-2xl md:text-3xl font-bold">{{track?.artist}} </h2>
                     </div>
                     <p class="mb-6 text-gray-300">
-                        Nam tristique ex vel magna tincidunt, Vivamus nibh velit, rutrum at ipsum ac, dignissim iaculis ante. Donec in velit non elit pulvinar pellentesque et non eros.
+                        {{track?.description}}
                     </p>
                     <div class="space-y-4">
                         <div class="font-bold text-gray-200">
-                            <p>Histoire 9dima</p>
+                            <p>{{track?.title}}</p>
                         </div>
                         <audio preload="auto" controls class="w-full md:w-96">
-                            <source src="../../../assets/audio/dummy-audio.mp3">
+                            <source [src]="track?.audioUrl">
                         </audio>
                     </div>
                 </div>
