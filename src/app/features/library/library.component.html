@@ -12,35 +12,70 @@
           
             <div class="flex-1 flex-wrap flex justify-center space-x-2">
               <button
-                type="button"
-                class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
-              >
-                ALL
-              </button>
-              <button
-                type="button"
-                class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
-              >
-                RAI
-              </button>
-              <button
-                type="button"
-                class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
-              >
-                POP
-              </button>
-              <button
-                type="button"
-                class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
-              >
-                CHA3BI
-              </button>
-              <button
-                type="button"
-                class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
-              >
-                RAP
-              </button>
+              type="button"
+              [class.bg-purple-900]="selectedCategory === 'ALL'"
+              [class.text-white]="selectedCategory === 'ALL'"
+              (click)="filterByCategory('ALL')"
+              class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+            >
+              ALL
+            </button>
+            <button
+              type="button"
+              [class.bg-purple-900]="selectedCategory === 'rai'"
+              [class.text-white]="selectedCategory === 'rai'"
+              (click)="filterByCategory('rai')"
+              class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+            >
+              RAI
+            </button>
+            <button
+    type="button"
+    [class.bg-purple-900]="selectedCategory === 'cha3bi'"
+    [class.text-white]="selectedCategory === 'cha3bi'"
+    (click)="filterByCategory('cha3bi')"
+    class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+  >
+    CHA3BI
+  </button>
+  <button
+    type="button"
+    [class.bg-purple-900]="selectedCategory === 'pop'"
+    [class.text-white]="selectedCategory === 'pop'"
+    (click)="filterByCategory('pop')"
+    class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+  >
+    POP
+  </button>
+  <button
+    type="button"
+    [class.bg-purple-900]="selectedCategory === 'rap'"
+    [class.text-white]="selectedCategory === 'rap'"
+    (click)="filterByCategory('rap')"
+    class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+  >
+    RAP
+  </button>
+  <button
+    type="button"
+    [class.bg-purple-900]="selectedCategory === 'rock'"
+    [class.text-white]="selectedCategory === 'rock'"
+    (click)="filterByCategory('rock')"
+    class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+  >
+  ROCK
+  </button>
+  <button
+    type="button"
+    [class.bg-purple-900]="selectedCategory === 'other'"
+    [class.text-white]="selectedCategory === 'other'"
+    (click)="filterByCategory('other')"
+    class="px-5 py-2 rounded-lg text-sm tracking-wider border-2 border-purple-950 outline-none bg-transparent hover:bg-purple-900 text-gray-950 font-extrabold hover:text-white transition-all duration-300"
+  >
+  OTHER
+  </button>
+
+              
             </div>
           
             <div class=" text-right">

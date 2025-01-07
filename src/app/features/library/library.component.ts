@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject, catchError, takeUntil } from 'rxjs';
+import { Observable, Subject, catchError, map, takeUntil } from 'rxjs';
 import { Track } from '../../core/models/track';
 import { TrackService } from '../../core/services/indexed-db.service';
 
@@ -18,10 +18,23 @@ export class LibraryComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   isLoading = true;
   error: string | null = null;
+  selectedCategory: string = 'ALL';
+
 
   constructor(private trackService: TrackService) {
     this.tracks$ = new Observable<Track[]>();
     this.filteredTracks$ = this.tracks$;
+  }
+
+  
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    this.tracks$ = this.trackService.getAllTrackMetadata().pipe(
+      map(tracks => {
+        if (category === 'ALL') return tracks;
+        return tracks.filter(track => track.category.toLowerCase() === category.toLowerCase());
+      })
+    );
   }
 
   ngOnInit() {

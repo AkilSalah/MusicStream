@@ -13,6 +13,7 @@ export interface Track {
 export enum MusicCategory {
   POP = 'pop',
   ROCK = 'rock',
+  RAI = 'rai',
   RAP = 'rap',
   CHAABI = 'cha3bi',
   OTHER = 'other'
