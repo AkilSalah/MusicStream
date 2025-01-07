@@ -28,8 +28,10 @@ export class SongModalComponent implements OnChanges {
       artist: ['', [Validators.required]],
       description: ['', [Validators.maxLength(200)]],
       category: [null, [Validators.required]],
+      duration: [0], 
     });
   }
+  
 
   // Close modal
   closeModal() {
@@ -60,34 +62,46 @@ export class SongModalComponent implements OnChanges {
     }
   }
 
-  // Handle file change (audio file)
   onFileChange(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const audio = new Audio();
       audio.src = URL.createObjectURL(file);
-      audio.onloadedmetadata = () => {
-        this.trackForm.patchValue({ duration: Math.round(audio.duration) });
-      };
+      
+      audio.addEventListener('loadedmetadata', () => {
+        const durationInSeconds = Math.round(audio.duration);
+        const minutes = Math.floor(durationInSeconds / 60);
+        const seconds = durationInSeconds % 60;
+        const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        console.log('Duration loaded:', formattedDuration);
+        this.trackForm.patchValue({ duration: formattedDuration });
+        URL.revokeObjectURL(audio.src);
+      });
+  
+      audio.addEventListener('error', (e) => {
+        console.error('Error loading audio:', e);
+      });
+  
       this.audioFile = file;
     }
   }
-
+  
+  
   onSubmit() {
-    if (this.trackForm.valid) {
+    if (this.trackForm.valid && this.audioFile) {
       const formValue = this.trackForm.value;
       const track: Track = {
-        id: this.mode === 'update' ? this.track!.id : '',
+        id: this.track?.id || '',
         title: formValue.title,
         artist: formValue.artist,
         description: formValue.description || '',
         category: formValue.category,
-        addedAt: this.mode === 'update' ? this.track!.addedAt : new Date(),
-        duration: this.mode === 'update' ? this.track!.duration : 0,
-        fileUrl: this.mode === 'update' ? this.track!.fileUrl : (this.audioFile?.name || '')
+        duration: formValue.duration || 0, 
+        addedAt: new Date(),
+        fileUrl: this.audioFile.name
       };
       
-      // Dans le cas d'une mise à jour, l'audioFile est optionnel
+      console.log('Submitting track with duration:', track.duration);
       this.submit.emit({ track, audioFile: this.audioFile });
       this.resetForm();
       this.closeModal();
