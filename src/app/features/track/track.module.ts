@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TrackRoutingModule } from './track-routing.module';
 import { TrackComponent } from './track.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -10,6 +11,7 @@ import { TrackComponent } from './track.component';
   imports: [
     CommonModule,
     TrackRoutingModule,
+    FormsModule
   ]
 })
 export class TrackModule { }
