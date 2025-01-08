@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Track } from '../models/track';
 import { BehaviorSubject, catchError, from, map, Observable, switchMap, throwError } from "rxjs";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
-import { v4 as uuidv4 } from 'uuid';  // Importation de uuid pour générer un ID unique
+import { v4 as uuidv4 } from 'uuid'; 
 
 interface AudioFileRecord {
   id: string;
@@ -34,6 +34,7 @@ export class TrackService {
       console.error('Database initialization failed:', error);
       this.dbReady$.error(error);
     });
+
   }
 
   private async initializeDB() {
