@@ -43,17 +43,18 @@ export class TrackComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Load all tracks
-    this.trackService.getAllTrackMetadata().subscribe(tracks => {
-      this.tracks = tracks;
-    });
-
-    this.route.params.subscribe(params => {
+    this.trackService.getAllTrackMetadata().pipe(
+      switchMap(tracks => {
+        this.tracks = tracks;
+        return this.route.params;
+      })
+    ).subscribe(params => {
       const trackId = params['id'];
       this.currentTrackIndex = this.tracks.findIndex(t => t.id === trackId);
       this.loadTrack(trackId);
     });
   }
+  
 
   private formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
@@ -134,7 +135,6 @@ export class TrackComponent implements OnInit {
     });
   }
 
-  // Existing methods
   nextTrack() {
     if (this.currentTrackIndex < this.tracks.length - 1) {
       const nextTrack = this.tracks[this.currentTrackIndex + 1];
