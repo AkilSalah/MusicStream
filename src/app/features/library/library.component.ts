@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subject, catchError, map, takeUntil } from 'rxjs';
 import { Track } from '../../core/models/track';
 import { TrackService } from '../../core/services/indexed-db.service';
+import { SearchService } from '../../core/services/search.service';
 
 @Component({
   selector: 'app-library',
@@ -11,7 +12,7 @@ import { TrackService } from '../../core/services/indexed-db.service';
 export class LibraryComponent implements OnInit, OnDestroy {
   tracks$: Observable<Track[]>;
   filteredTracks$: Observable<Track[]>;
-  searchTerm = '';
+  searchText: string = '';
   isModalVisible: boolean = false;
   selectedTrack: Track | null = null;
   modalMode: 'add' | 'update' = 'add';
@@ -22,9 +23,23 @@ export class LibraryComponent implements OnInit, OnDestroy {
   trackImages: Map<string, string> = new Map();
 
 
-  constructor(private trackService: TrackService) {
+  constructor(private trackService: TrackService,private searchService: SearchService) {
     this.tracks$ = new Observable<Track[]>();
     this.filteredTracks$ = this.tracks$;
+  }
+
+  searchTrack(): void {
+    this.tracks$ = this.tracks$.pipe(
+      map(tracks => {
+        const searchText = this.searchText.trim().toLowerCase();
+        if (!searchText) return tracks;
+        
+        return tracks.filter(track =>
+          track.title.toLowerCase().includes(searchText) ||
+          track.artist.toLowerCase().includes(searchText)
+        );
+      })
+    );
   }
   
   
@@ -45,7 +60,17 @@ export class LibraryComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (ready) => {
         if (ready) {
+          // Initialiser d'abord les tracks
           this.loadTracks();
+          
+          // Puis s'abonner aux changements de recherche
+          this.searchService.searchText$.pipe(
+            takeUntil(this.destroy$)
+          ).subscribe(text => {
+            this.searchText = text;
+            this.searchTrack();
+          });
+          
           this.isLoading = false;
         }
       },
@@ -55,17 +80,11 @@ export class LibraryComponent implements OnInit, OnDestroy {
         console.error('Database initialization error:', error);
       }
     });
-    this.tracks$.subscribe(tracks => {
-      tracks.forEach(track => {
-        this.loadTrackImage(track.id);
-      });
-    });
   }
 
   loadTracks() {
     this.tracks$ = this.trackService.getAllTrackMetadata().pipe(
       map(tracks => {
-        // Charger uniquement les images qui ne sont pas encore dans trackImages
         tracks.forEach(track => {
           if (!this.trackImages.has(track.id)) {
             this.loadTrackImage(track.id);
@@ -79,6 +98,8 @@ export class LibraryComponent implements OnInit, OnDestroy {
         return [];
       })
     );
+    
+    // Initialiser filteredTracks$ avec tous les tracks au départ
     this.filteredTracks$ = this.tracks$;
   }
 
