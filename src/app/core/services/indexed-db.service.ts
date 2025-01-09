@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Track } from '../models/track';
-import { BehaviorSubject, catchError, from, map, Observable, switchMap, throwError } from "rxjs";
+import { BehaviorSubject, catchError, from, map, Observable, of, switchMap, throwError } from "rxjs";
 import { DBSchema, IDBPDatabase, openDB } from "idb";
 import { v4 as uuidv4 } from 'uuid'; 
 
 interface AudioFileRecord {
+  id: string;
+  file: Blob;
+}
+interface ImageFileRecord {
   id: string;
   file: Blob;
 }
@@ -17,6 +21,10 @@ interface TrackDB extends DBSchema {
   audioFiles: {
     key: string;
     value: AudioFileRecord;
+  };
+  imageFiles: {
+    key: string;
+    value: ImageFileRecord;
   };
 }
 
@@ -39,15 +47,16 @@ export class TrackService {
 
   private async initializeDB() {
     try {
-      this.db = await openDB<TrackDB>('trackDB', 3, {
+      this.db = await openDB<TrackDB>('trackDB', 5, {  
         upgrade(db, oldVersion, newVersion) {
-          if (oldVersion < 2) {
-            if (!db.objectStoreNames.contains('tracks')) {
-              db.createObjectStore('tracks', { keyPath: 'id' });
-            }
-            if (!db.objectStoreNames.contains('audioFiles')) {
-              db.createObjectStore('audioFiles', { keyPath: 'id' });
-            }
+          if (!db.objectStoreNames.contains('tracks')) {
+            db.createObjectStore('tracks', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('audioFiles')) {
+            db.createObjectStore('audioFiles', { keyPath: 'id' });
+          }
+          if (!db.objectStoreNames.contains('imageFiles')) {
+            db.createObjectStore('imageFiles', { keyPath: 'id' });
           }
         },
       });
@@ -101,40 +110,48 @@ export class TrackService {
     );
   }
 
-  addTrack(track: Track, audioFile: Blob): Observable<Track> {
-    console.log('Adding track:', track);
-    console.log('Audio file:', audioFile);
+  saveImageFile(id: string, file: Blob): Observable<void> {
+    if (!file.type.startsWith('image/')) {
+      return throwError(() => new Error('Invalid file type. Must be an image file.'));
+    }
+
+    const imageFileRecord: ImageFileRecord = {
+      id,
+      file
+    };
+
+    return this.ensureDB().pipe(
+      switchMap(db => from(db.put('imageFiles', imageFileRecord))),
+      map(() => undefined),
+      catchError((error) => {
+        console.error('Error saving image file:', error);
+        return throwError(() => new Error('Error saving image file.'));
+      })
+    );
+  }
   
-    // Ensure track has required fields
+  addTrack(track: Track, audioFile: Blob, imageFile?: Blob): Observable<Track> {
     if (!track || !track.title || !track.artist) {
-      console.error('Invalid track data:', track);
-      return throwError(() => new Error('Invalid track data. Title and artist are required.'));
+      return throwError(() => new Error('Invalid track data.'));
     }
-  
-    if (!audioFile) {
-      console.error('Missing audio file');
-      return throwError(() => new Error('Missing audio file.'));
-    }
-  
-    // Generate new ID for new tracks
+
     const trackToSave: Track = {
       ...track,
-      id: track.id || uuidv4(), // Generate new ID if none exists
-      addedAt: track.addedAt || new Date() // Ensure date exists
+      id: track.id || uuidv4(),
+      addedAt: track.addedAt || new Date()
     };
-  
+
     return this.saveTrackMetadata(trackToSave).pipe(
       switchMap(() => this.saveAudioFile(trackToSave.id, audioFile)),
-      map(() => {
-        console.log('Track added successfully:', trackToSave);
-        return trackToSave;
-      }),
+      switchMap(() => imageFile ? this.saveImageFile(trackToSave.id, imageFile) : of(undefined)),
+      map(() => trackToSave),
       catchError((error) => {
         console.error('Error adding track:', error);
         return throwError(() => new Error('Error adding track.'));
       })
     );
   }
+  
   // Dans le service
 updateTrackMetadata(track: Track): Observable<Track> {
   return this.saveTrackMetadata(track).pipe(
@@ -146,29 +163,34 @@ updateTrackMetadata(track: Track): Observable<Track> {
   );
 }
 
-  updateTrack(updatedTrack: Track, audioFile: Blob): Observable<Track> {
-    return this.saveTrackMetadata(updatedTrack).pipe(
-      switchMap(() => this.saveAudioFile(updatedTrack.id, audioFile)),
-      map(() => updatedTrack),
-      catchError((error) => {
-        console.error('Error updating track:', error);
-        return throwError(() => new Error('Error updating track.'));
-      })
-    );
-  }
+updateTrack(updatedTrack: Track, audioFile: Blob, imageFile?: Blob): Observable<Track> {
+  return this.saveTrackMetadata(updatedTrack).pipe(
+    switchMap(() => this.saveAudioFile(updatedTrack.id, audioFile)),
+    switchMap(() => imageFile ? this.saveImageFile(updatedTrack.id, imageFile) : of(undefined)),
+    map(() => updatedTrack),
+    catchError((error) => {
+      console.error('Error updating track:', error);
+      return throwError(() => new Error('Error updating track.'));
+    })
+  );
+}
 
-  deleteTrack(id: string): Observable<void> {
-    return this.ensureDB().pipe(
-      switchMap(db =>
-        from(Promise.all([db.delete('tracks', id), db.delete('audioFiles', id)]))
-      ),
-      map(() => undefined),
-      catchError((error) => {
-        console.error('Error deleting track:', error);
-        return throwError(() => new Error('Error deleting track.'));
-      })
-    );
-  }
+deleteTrack(id: string): Observable<void> {
+  return this.ensureDB().pipe(
+    switchMap(db =>
+      from(Promise.all([
+        db.delete('tracks', id),
+        db.delete('audioFiles', id),
+        db.delete('imageFiles', id)
+      ]))
+    ),
+    map(() => undefined),
+    catchError((error) => {
+      console.error('Error deleting track:', error);
+      return throwError(() => new Error('Error deleting track.'));
+    })
+  );
+}
 
   getTrackById(id: string): Observable<Track | undefined> {
     return this.ensureDB().pipe(
@@ -190,6 +212,18 @@ updateTrackMetadata(track: Track): Observable<Track> {
       })
     );
   }
+
+  getImageFile(id: string): Observable<Blob | undefined> {
+    return this.ensureDB().pipe(
+      switchMap(db => from(db.get('imageFiles', id))),
+      map(record => record?.file),
+      catchError((error) => {
+        console.error('Error fetching image file:', error);
+        return throwError(() => new Error('Error fetching image file.'));
+      })
+    );
+  }
+
 
   getAllTrackMetadata(): Observable<Track[]> {
     return this.ensureDB().pipe(

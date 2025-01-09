@@ -19,13 +19,14 @@ export class LibraryComponent implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
   selectedCategory: string = 'ALL';
+  trackImages: Map<string, string> = new Map();
 
 
   constructor(private trackService: TrackService) {
     this.tracks$ = new Observable<Track[]>();
     this.filteredTracks$ = this.tracks$;
   }
-
+  
   
   filterByCategory(category: string) {
     this.selectedCategory = category;
@@ -36,6 +37,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
       })
     );
   }
+  
 
   ngOnInit() {
     this.trackService.dbReady$.pipe(
@@ -53,15 +55,24 @@ export class LibraryComponent implements OnInit, OnDestroy {
         console.error('Database initialization error:', error);
       }
     });
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.tracks$.subscribe(tracks => {
+      tracks.forEach(track => {
+        this.loadTrackImage(track.id);
+      });
+    });
   }
 
   loadTracks() {
     this.tracks$ = this.trackService.getAllTrackMetadata().pipe(
+      map(tracks => {
+        // Charger uniquement les images qui ne sont pas encore dans trackImages
+        tracks.forEach(track => {
+          if (!this.trackImages.has(track.id)) {
+            this.loadTrackImage(track.id);
+          }
+        });
+        return tracks;
+      }),
       catchError(error => {
         this.error = 'Failed to load tracks';
         console.error('Error loading tracks:', error);
@@ -71,6 +82,13 @@ export class LibraryComponent implements OnInit, OnDestroy {
     this.filteredTracks$ = this.tracks$;
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    // Nettoyer toutes les URLs d'images
+    this.trackImages.forEach(url => URL.revokeObjectURL(url));
+    this.trackImages.clear();
+  }
   // Show modal for adding new track
   showAddModal() {
     this.selectedTrack = null;
@@ -91,40 +109,65 @@ export class LibraryComponent implements OnInit, OnDestroy {
     this.selectedTrack = null;
   }
 
-  onSongSubmit(event: { track: Track, audioFile: File | null }) {
+  onSongSubmit(event: { 
+    track: Track; 
+    audioFile: File | null;
+    imageFile: File | null;
+  }) {
     if (!event || !event.track) {
       console.error('Invalid submission data');
       return;
     }
   
     if (this.modalMode === 'add' && event.audioFile) {
-      this.trackService.addTrack(event.track, event.audioFile).subscribe({
+      // Créer immédiatement l'URL de l'image si elle existe
+      if (event.imageFile) {
+        const imageUrl = URL.createObjectURL(event.imageFile);
+        this.trackImages.set(event.track.id, imageUrl);
+      }
+
+      this.trackService.addTrack(event.track, event.audioFile, event.imageFile || undefined).subscribe({
         next: (addedTrack) => {
           console.log('Track added successfully:', addedTrack);
+          // Pas besoin de recharger l'image car elle est déjà affichée
           this.loadTracks();
           this.closeModal();
         },
         error: (err) => {
+          // En cas d'erreur, supprimer l'URL de l'image
+          if (event.imageFile) {
+            URL.revokeObjectURL(this.trackImages.get(event.track.id) || '');
+            this.trackImages.delete(event.track.id);
+          }
           console.error('Failed to add track:', err);
           this.error = 'Failed to add track';
         }
       });
     } else if (this.modalMode === 'update') {
-      // Vérifie si audioFile est présent avant de l'utiliser
       if (event.audioFile) {
-        this.trackService.updateTrack(event.track, event.audioFile).subscribe({
+        // Même logique pour la mise à jour
+        if (event.imageFile) {
+          const imageUrl = URL.createObjectURL(event.imageFile);
+          this.trackImages.set(event.track.id, imageUrl);
+        }
+
+        this.trackService.updateTrack(event.track, event.audioFile, event.imageFile || undefined).subscribe({
           next: (updatedTrack) => {
             console.log('Track updated successfully:', updatedTrack);
             this.loadTracks();
             this.closeModal();
           },
           error: (err) => {
+            if (event.imageFile) {
+              URL.revokeObjectURL(this.trackImages.get(event.track.id) || '');
+              this.trackImages.delete(event.track.id);
+            }
             console.error('Failed to update track:', err);
             this.error = 'Failed to update track';
           }
         });
       } else {
-        // Si pas de nouveau fichier audio, met à jour uniquement les métadonnées
+        // Mise à jour des métadonnées uniquement
         this.trackService.updateTrackMetadata(event.track).subscribe({
           next: (updatedTrack) => {
             console.log('Track metadata updated successfully:', updatedTrack);
@@ -140,7 +183,18 @@ export class LibraryComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Delete track
+  loadTrackImage(trackId: string) {
+    this.trackService.getImageFile(trackId).subscribe({
+      next: (blob) => {
+        if (blob) {
+          const imageUrl = URL.createObjectURL(blob);
+          this.trackImages.set(trackId, imageUrl);
+        }
+      },
+      error: (error) => console.error('Error loading image:', error)
+    });
+  }
+
   deleteTrack(trackId: string) {
     if (confirm('Are you sure you want to delete this track?')) {
       this.trackService.deleteTrack(trackId).subscribe({
@@ -153,10 +207,5 @@ export class LibraryComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
-
-  // Clear error message
-  clearError() {
-    this.error = null;
   }
 }
