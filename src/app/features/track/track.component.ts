@@ -19,7 +19,8 @@ export class TrackComponent implements OnInit {
   playerStatus$: Observable<PlayerState>;
   playerError$: Observable<string | null>;
   audioUrl: string | null = null;
-  
+  imageUrl: string | null = null;  
+
   // Player state
   isPlaying = false;
   isMuted = false;
@@ -41,7 +42,23 @@ export class TrackComponent implements OnInit {
     this.playerStatus$ = this.store.select(PlayerSelectors.selectPlayerStatus);
     this.playerError$ = this.store.select(PlayerSelectors.selectPlayerError);
   }
-
+  private loadTrackImage(trackId: string) {
+    this.trackService.getImageFile(trackId).subscribe({
+      next: (imageBlob) => {
+        if (imageBlob) {
+          // Nettoyer l'ancienne URL si elle existe
+          if (this.imageUrl) {
+            URL.revokeObjectURL(this.imageUrl);
+          }
+          // Créer une nouvelle URL pour l'image
+          this.imageUrl = URL.createObjectURL(imageBlob);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading track image:', error);
+      }
+    });
+  }
   ngOnInit() {
     this.trackService.getAllTrackMetadata().pipe(
       switchMap(tracks => {
@@ -69,6 +86,8 @@ export class TrackComponent implements OnInit {
       this.audioPlayer.nativeElement.pause();
     }
   }
+
+
 
   toggleMute() {
     this.audioPlayer.nativeElement.muted = !this.audioPlayer.nativeElement.muted;
@@ -108,6 +127,7 @@ export class TrackComponent implements OnInit {
       tap(track => {
         if (track) {
           this.store.dispatch(PlayerActions.loadSuccess({ track }));
+          this.loadTrackImage(track.id);
         } else {
           this.store.dispatch(PlayerActions.loadError({ error: 'Track not found' }));
         }
@@ -171,6 +191,9 @@ export class TrackComponent implements OnInit {
   ngOnDestroy() {
     if (this.audioUrl) {
       URL.revokeObjectURL(this.audioUrl);
+    }
+    if(this.imageUrl){
+      URL.revokeObjectURL(this.imageUrl)
     }
   }
 }
