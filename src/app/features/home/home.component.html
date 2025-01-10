@@ -5,6 +5,63 @@
     <div class="relative max-w-screen-xl mt-16 mx-auto px-8 z-10 text-center text-white">
       <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6">Welcome to Our Premium Service</h1>
       <p class="text-lg md:text-xl mb-12">Experience excellence like never before with our exclusive Music and services.</p>
-      <button type="button" class="bg-[#4b2c45] hover:bg-[#842d77] text-white text-base tracking-wide px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-lg hover:shadow-xl">Get Started</button>
+      <button routerLink="/library" type="button" class="bg-[#4b2c45] hover:bg-[#842d77] text-white text-base tracking-wide px-6 py-3 rounded-full transition duration-300 ease-in-out shadow-lg hover:shadow-xl">Get Started</button>
     </div>
 </div>
+<section class="relative h-[30vh] bg-black">
+  <img src="../../../assets/img/breadcumb3.jpg" alt="Events background" class="w-full h-full object-cover opacity-50">
+  <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
+      <p class="text-lg mb-4">See what's new</p>
+      <h1 class="text-5xl font-bold tracking-wider">EVENTS</h1>
+  </div>
+</section>
+
+<!-- Events Grid -->
+<section class="container mx-auto px-4 py-24">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Event Card 1 -->
+      <div class="group rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 bg-white">
+          <div class="relative overflow-hidden">
+              <img src="../../../assets/img/breadcumb3.jpg" alt="DJ Night Party" class="w-full aspect-[4/3] object-cover">
+          </div>
+          <div class="bg-gradient-to-r from-purple-900 to-indigo-800  font-[sans-serif] text-white p-8">
+            <h3 class="text-2xl font-bold mb-4">DJ NIGHT PARTY</h3>
+              <div class="flex justify-between text-sm mb-6">
+                  <span>VIP Sala</span>
+                  <span>June 15, 2028</span>
+              </div>
+              <a href="#" class="inline-block text-sm bg-purple-700 p-2 rounded-lg tracking-widest hover:text-gray-300">SEE EVENT</a>
+          </div>
+      </div>
+
+      <!-- Event Card 2 -->
+      <div class="group rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 bg-white">
+          <div class="relative overflow-hidden">
+              <img src="../../../assets/img/a10.jpg" alt="The Mission" class="w-full aspect-[4/3] object-cover">
+          </div>
+          <div class="bg-black text-white p-8">
+              <h3 class="text-2xl font-bold mb-4">THE MISSION</h3>
+              <div class="flex justify-between text-sm mb-6">
+                  <span>Gold Arena</span>
+                  <span>June 15, 2028</span>
+              </div>
+              <a href="#" class="inline-block text-sm bg-purple-700 p-2 rounded-lg tracking-widest hover:text-gray-300">SEE EVENT</a>
+          </div>
+      </div>
+
+      <!-- Event Card 3 -->
+      <div class="group rounded-lg shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 bg-white">
+          <div class="relative overflow-hidden">
+              <img src="../../../assets/img/e5.jpg" alt="Planet Ibiza" class="w-full aspect-[4/3] object-cover">
+          </div>
+          <div class="bg-gradient-to-r from-purple-900 to-indigo-800  font-[sans-serif] text-white p-8">
+              <h3 class="text-2xl font-bold mb-4">PLANET IBIZA</h3>
+              <div class="flex justify-between text-sm mb-6">
+                  <span>Space Ibiza</span>
+                  <span>June 15, 2028</span>
+              </div>
+              <a href="#" class="inline-block text-sm bg-purple-700 p-2 rounded-lg tracking-widest hover:text-gray-300">SEE EVENT</a>
+          </div>
+      </div>
+  </div>
+</section>
