@@ -42,7 +42,6 @@ export class TrackService {
       console.error('Database initialization failed:', error);
       this.dbReady$.error(error);
     });
-
   }
 
   private async initializeDB() {
